@@ -52,7 +52,7 @@ window.OT = {
 
 window.TB = OT;
 
-window.addEventListener("orientationchange", (function() {
+window.addEventListener("resize", (function() {
   setTimeout((function() {
     OT.updateViews();
   }), 1000);
@@ -199,6 +199,14 @@ replaceWithVideoStream = function(divName, streamId, properties) {
   element.setAttribute("data-streamid", streamId);
   element.style.width = properties.width + "px";
   element.style.height = properties.height + "px";
+
+  if ((properties != null) && properties.width === "100%" && properties.height === "100%") {
+          element.style.width = "100%";
+          element.style.height = "100%";
+          properties.width = "";
+          properties.height = "";
+        }
+
   element.style.overflow = "hidden";
   element.style['background-color'] = "#000000";
   streamElements[streamId] = element;
@@ -328,7 +336,7 @@ TBPublisher = (function() {
     position = getPosition(this.domId);
     TBUpdateObjects();
     OT.getHelper().eventing(this);
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName, ratios.widthRatio, ratios.heightRatio, borderRadius]);
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, position.width, position.height, zIndex, publishAudio, publishVideo, cameraName, ratios.widthRatio, ratios.heightRatio, borderRadius]);
     Cordova.exec(this.eventReceived, TBSuccess, OTPlugin, "addEvent", ["publisherEvents"]);
   }
 
@@ -852,12 +860,6 @@ TBSubscriber = (function() {
     this.element = element;
     pdebug("creating subscriber", properties);
     this.streamId = stream.streamId;
-    if ((properties != null) && properties.width === "100%" && properties.height === "100%") {
-      element.style.width = "100%";
-      element.style.height = "100%";
-      properties.width = "";
-      properties.height = "";
-    }
     divPosition = getPosition(divName);
     subscribeToVideo = "true";
     zIndex = TBGetZIndex(element);
@@ -886,7 +888,7 @@ TBSubscriber = (function() {
     ratios = TBGetScreenRatios();
     borderRadius = TBGetBorderRadius(element);
     pdebug("final subscriber position", position);
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToAudio, subscribeToVideo, ratios.widthRatio, ratios.heightRatio, borderRadius]);
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, position.width, position.height, zIndex, subscribeToAudio, subscribeToVideo, ratios.widthRatio, ratios.heightRatio, borderRadius]);
   }
 
   TBSubscriber.prototype.removeEventListener = function(event, listener) {
